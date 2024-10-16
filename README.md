@@ -8,12 +8,9 @@
         <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dd/auto-gptq">
     </a>
 </p>
-<h4 align="center">
-    <p>
-        <b>English</b> |
-        <a href="https://github.com/PanQiWei/AutoGPTQ/blob/main/README_zh.md">中文</a>
-    </p>
-</h4>
+
+## NOTE
+This repository is modified from the official [AutoGPTQ](https://github.com/AutoGPTQ/AutoGPTQ) repository at version 0.8.0.dev0 to support quantizing [Ovis](https://github.com/AIDC-AI/Ovis) models. Currently we have the following quantized versions: [Ovis1.6-Gemma2-9B-GPTQ-Int4](https://huggingface.co/AIDC-AI/Ovis1.6-Gemma2-9B-GPTQ-Int4) and [Ovis1.6-Llama3.2-3B-GPTQ-Int4](https://huggingface.co/AIDC-AI/Ovis1.6-Llama3.2-3B-GPTQ-Int4). Check the HuggingFace model card for installation details. The contents below are from the original AutoGPTQ repo.
 
 ## News or Update
 

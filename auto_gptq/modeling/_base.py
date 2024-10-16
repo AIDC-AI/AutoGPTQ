@@ -1,3 +1,6 @@
+# Copyright (c) 潘其威(William)
+# Copyright (c) 2024 AIDC-AI
+
 import copy
 import logging
 import os
@@ -180,6 +183,7 @@ class BaseGPTQForCausalLM(nn.Module, PushToHubMixin):
         use_cuda_fp16: bool = True,
         autotune_warmup_after_quantized: bool = False,
         cache_examples_on_gpu: bool = True,
+        samples_dtype: torch.dtype = torch.bfloat16
     ):
         if self.quantized:
             raise EnvironmentError("can't execute quantize because the model is quantized.")
@@ -260,15 +264,23 @@ class BaseGPTQForCausalLM(nn.Module, PushToHubMixin):
 
         # TODO: make this optional, backporting https://github.com/huggingface/optimum/blob/main/optimum/gptq/quantizer.py
         handle = layers[0].register_forward_pre_hook(store_input_hook, with_kwargs=True)
-        for example in examples:
+
+        for example in tqdm(examples):
             for k, v in example.items():
-                if len(v.shape) == 1:
-                    v = v.unsqueeze(0)
-                example[k] = move_to_device(v, cur_layer_device)
+                if isinstance(v, list):
+                    for i in range(len(v)):
+                        if len(v[i].shape) == 1:
+                            v[i] = v[i].unsqueeze(0)
+                        v[i] = move_to_device(v[i].to(samples_dtype), cur_layer_device)
+                else:
+                    if len(v.shape) == 1:
+                        v = v.unsqueeze(0)
+                    example[k] = move_to_device(v, cur_layer_device)
             try:
                 self.model(**example)
             except ValueError:
                 pass
+
         handle.remove()
 
         move_to_device(layers[0], CPU if force_layer_back_to_cpu else cur_layer_device)
@@ -672,7 +684,7 @@ class BaseGPTQForCausalLM(nn.Module, PushToHubMixin):
         model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, **merged_kwargs)
 
         model_config = model.config.to_dict()
-        seq_len_keys = ["max_position_embeddings", "seq_length", "n_positions"]
+        seq_len_keys = ["max_position_embeddings", "seq_length", "n_positions", "multimodal_max_length"]
         if any(k in model_config for k in seq_len_keys):
             for key in seq_len_keys:
                 if key in model_config:
@@ -1169,7 +1181,7 @@ class BaseGPTQForCausalLM(nn.Module, PushToHubMixin):
 
         # == step4: set seqlen == #
         model_config = model.config.to_dict()
-        seq_len_keys = ["max_position_embeddings", "seq_length", "n_positions"]
+        seq_len_keys = ["max_position_embeddings", "seq_length", "n_positions", "multimodal_max_length"]
         if any(k in model_config for k in seq_len_keys):
             for key in seq_len_keys:
                 if key in model_config:

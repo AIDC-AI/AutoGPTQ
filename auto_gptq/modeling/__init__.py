@@ -1,3 +1,6 @@
+# Copyright (c) 潘其威(William)
+# Copyright (c) 2024 AIDC-AI
+
 from ._base import BaseGPTQForCausalLM, BaseQuantizeConfig
 from .auto import GPTQ_CAUSAL_LM_MODEL_MAP, AutoGPTQForCausalLM
 from .baichuan import BaiChuanGPTQForCausalLM
@@ -28,3 +31,4 @@ from .starcoder2 import Starcoder2GPTQForCausalLM
 from .xverse import XverseGPTQForCausalLM
 from .yi import YiGPTQForCausalLM
 from .minicpm3 import MiniCPM3GPTQForCausalLM
+from .ovis import OvisGemma2GPTQForCausalLM, OvisLlamaGPTQForCausalLM
